@@ -628,9 +628,271 @@ Example Zone File: /var/named/0.168.192.in-addr.arpa
 6       IN      PTR     mail.yahoo.net. [cite: 37]
 
 ```
+# Chapter 3: Web Servers and Apache (httpd)
+## Definition of a Web Server
+A web server is a software program that runs on a server and its primary function is to process incoming network requests from clients over the HTTP (Hypertext Transfer Protocol) and HTTPS (HTTP Secure) protocols. It acts as the intermediary between the server's files and the client's web browser. When a client requests a resource, such as an HTML page or an image, the web server locates that resource and sends it back to the client.
+
+Well-known web server software includes 
+
+Apache, Nginx, IIS (Microsoft's Internet Information Services), and Tomcat.
+
+### Why Web Servers Are Used
+A web server is used to publish a website and make it accessible to users on the internet. Without a web server, a website would just be a collection of files on a computer, with no way for anyone else to access them. The web server listens for requests 24/7, retrieves the requested files (like HTML, CSS, JavaScript, and images), and delivers them to the user's browser, allowing the website to be viewed.
+
+### Static vs. Dynamic Content
+**`Static Content`**: This refers to any content that is delivered to the user's browser exactly as it is stored on the server. The content does not change based on user interaction. Examples include HTML files, CSS files, JavaScript files, and images.
+
+**`Dynamic Content`**: This refers to content that is generated on-the-fly by the server before being sent to the user. This often involves scripting languages (like PHP) and database interaction. The content can be personalized for each user, such as a shopping cart or a user profile page.
+
+### Apache (httpd) Initial Setup
+This section covers the basic installation and initial configuration of the Apache HTTP Server, which is provided by the httpd package on Red Hat-based systems.
+
+Installation and Service Management
+The first step is to install the software package and ensure the service is running and enabled to start on boot.
+
+```
+# Install the httpd package
+dnf install httpd -y
+
+# Check the status of the service
+systemctl status httpd.service
+
+# Start the service for the current session
+systemctl start httpd
+
+# Enable the service to start automatically on boot
+systemctl enable httpd
+```
+
+### Firewall Configuration
+For the web server to be accessible from the internet, you must allow HTTP traffic through the system's firewall.
+```
+# Add a permanent rule to allow the standard http service (port 80)
+firewall-cmd --add-service=http --permanent
+
+# Reload the firewall to apply the new rule immediately
+firewall-cmd --reload
+```
 
 
+### Disabling the Default Welcome Page
+By default, Apache displays a welcome page. It is a best practice to disable this page before configuring your own websites.
+```
+mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome
+```
 
+
+Explanation: Apache loads all configuration files in the /etc/httpd/conf.d/ directory that end with the .conf extension. By renaming the file, we remove this extension, which prevents Apache from loading it and displaying the default page.
+
+## Introduction to Virtual Hosting
+Definition of Virtual Hosting
+Virtual Hosting is a feature of Apache that allows a single server to host multiple, independent websites. Even though these websites are running on the same machine, they appear as separate sites to the end-user. This is the core technology that makes shared web hosting possible.
+
+### Methods of Separating Sites
+There are three primary methods Apache can use to differentiate between the websites it is hosting:
+
+**`IP-Based Virtual Hosting`**: In this method, each website has its own unique IP address. When a request comes in, Apache uses the destination IP address of the request to determine which website to serve.
+
+**`Port-Based Virtual Hosting`**: In this method, multiple websites share the same IP address, but each website listens on a different port number. For example, http://example.com:80 could serve one site, while http://example.com:8080 serves another.
+
+**`Name-Based (FQDN) Virtual Hosting`**: This is the most common and efficient method. Multiple websites share the same IP address and port (usually port 80 for HTTP). Apache uses the hostname provided by the client in the Host Header of the HTTP request to determine which website to serve.
+
+## Practical Apache Configuration
+
+### Changing the Default Listening Port
+To configure Apache to listen on a port other than the default of 80, you need to edit the main Apache configuration file.
+
+The Listen directive specifies the ports that Apache will bind to. You can add new Listen directives to make Apache listen on multiple ports simultaneously.
+
+```
+File to Edit: /etc/httpd/conf/httpd.conf 
+```
+
+Directive to Add/Modify: To make Apache listen on port 8080, you would add the following line to the configuration file:
+```
+Apache
+
+Listen 8080
+```
+
+After adding this line and configuring a virtual host for that port, you must also open the new port in the firewall (
+```
+firewall-cmd --add-port=8080/tcp --permanent) 
+```
+and restart the httpd service. 
+
+## Step-by-Step Guide: Setting Up a Name-Based Virtual Host
+This guide details the complete process for hosting a website, www.itpolicy.ir, using the name-based virtual hosting method.
+
+### Step 1: Create the Virtual Host Configuration File
+First, you need to create a new configuration file specifically for your new website inside the /etc/httpd/conf.d/ directory. Keeping each site in its own file is a best practice for organization.
+
+```
+sudo vim /etc/httpd/conf.d/itpolicy.ir.conf
+```
+
+### Step 2: Add the Virtual Host Configuration
+Next, add the following content to the new file. This block of directives tells Apache how to handle requests for www.itpolicy.ir.
+```
+<VirtualHost 92.114.19.118:80>
+    ServerName www.itpolicy.ir
+    ServerAlias itpolicy.ir
+    DocumentRoot /var/www/itpolicy_ir
+    DirectoryIndex index.html
+</VirtualHost>
+```
+
+Directive Explanations:
+
+**`<VirtualHost 92.114.19.118:80>`**: Defines a virtual host that listens on the specific IP 92.114.19.118 and port 80.
+
+**`ServerName www.itpolicy.ir`**: This is the primary domain name for this website. It's the most important directive for name-based hosting.
+
+**`ServerAlias itpolicy.ir`**: Specifies any other names that this site should respond to, such as the domain without the www.
+
+**`DocumentRoot /var/www/itpolicy_ir`**: This is the path to the directory where the website's files (HTML, CSS, images) are stored.
+
+**`DirectoryIndex index.html`**: Specifies the default file to serve when a user accesses a directory.
+
+### Step 3: Create the Website's Directory and Content
+Now, you must create the directory that you specified as the DocumentRoot and place your website's files inside it.
+
+```
+# Create the document root directory
+sudo mkdir -p /var/www/itpolicy_ir/
+
+# Create a simple index file for testing
+sudo vim /var/www/itpolicy_ir/index.html
+```
+
+
+You should add some basic HTML content to the index.html file, for example: hello world
+
+### Step 4: Apply the New Apache Configuration
+For the changes to take effect, you must restart the Apache service. This forces it to re-read its configuration files, including the new itpolicy.ir.conf file you created.
+```
+sudo systemctl restart httpd
+```
+
+### Step 5: Configure the DNS Record
+The final and crucial step is to ensure that your domain name points to your web server's IP address. This is done in your domain's DNS zone file. You must add A records to map the hostname to the IP address specified in your <VirtualHost> block.
+```
+www           60      IN      A       92.114.19.118
+itpolicy.ir.          IN      A       92.114.19.118
+```
+
+## Apache User Directories (UserDir)
+
+The User Directory feature (enabled by the mod_userdir module) allows each user on the Linux system to host a personal website in a specific subdirectory within their own home directory. This is a convenient way to provide personal web space for multiple users on a single server, often used in educational or development environments.
+
+When enabled, a user's site is typically accessible via a URL like http://your-server-ip/~username.
+
+### Step 1: Configure the userdir.conf File
+You must first enable the feature in its dedicated configuration file.
+```
+sudo vim /etc/httpd/conf.d/userdir.conf 
+```
+Configuration Changes:
+
+
+* Line 17: Find the line UserDir disabled and change it to UserDir enabled. 
+
+
+* Line 24: Ensure the line UserDir public_html is present and not commented out.  This tells Apache that the web content for each user is located in a directory named public_html inside their home directory.
+
+### Step 2: Create a User and Their Web Directory
+Next, create a system user and the public_html directory for them.
+```
+# Create a new system user named 'pouria'
+sudo useradd pouria
+
+# Create the public_html directory inside their home directory
+sudo mkdir -p /home/pouria/public_html 
+```
+
+### Step 3: Set Correct Permissions (Critical Step)
+The Apache process (which runs as the apache user) needs permission to access the user's home directory and read the files inside public_html. Incorrect permissions are the most common cause of "403 Forbidden" errors.
+```
+sudo chmod -R 755 /home/pouria 
+```
+
+* Explanation: This command sets the permissions for the user's home directory to 755 (read and execute for everyone), which allows the Apache service to enter the directory and serve its content.
+
+### Step 4: Create Content
+Create a simple test page inside the user's web directory.
+```
+sudo vim /home/pouria/public_html/index.html 
+```
+* Content: Add some basic HTML, for example: <h1>Pouria's Home Page</h1>.
+
+### Step 5: Apply Changes
+Finally, restart Apache to apply the new configuration.
+```
+sudo systemctl restart httpd 
+```
+
+Your user's personal site should now be accessible.
+
+## Basic Authentication
+Basic Authentication is a simple and straightforward method to password-protect a specific website or directory on your server. When a user tries to access the protected area, their browser will display a pop-up dialog asking for a username and password. This is useful for restricting access to administrative areas or private content.
+
+* Note: Basic Authentication is not encrypted over a standard HTTP connection and should always be used with HTTPS to be secure.
+
+### Step 1: Create a Password File with htpasswd
+This utility is used to create and manage the file that stores the usernames and encrypted passwords.
+```
+# Create a NEW password file and add the first user 'kheirkhah'
+sudo htpasswd -c /etc/httpd/conf/.htpasswd kheirkhah
+
+# Add a SECOND user 'pouria' to the EXISTING file
+sudo htpasswd /etc/httpd/conf/.htpasswd pouria
+```
+
+Explanation:
+
+**`htpasswd`**: The command-line tool.
+
+**`-c`**: The create flag. IMPORTANT: Only use this flag for the very first user. Using it again will overwrite the file and delete all existing users.
+
+**`/etc/httpd/conf/.htpasswd`**: The path where the password file will be stored.
+
+**`kheirkhah / pouria`**: The usernames. You will be prompted to enter a password for each user.
+
+### Step 2: Configure Apache to Protect a Directory
+Now, you must tell Apache which directory to protect and where to find the password file. This is done by adding a Directory block to your site's virtual host configuration file.
+```
+sudo vim /etc/httpd/conf.d/kheirkhah.conf 
+```
+
+Configuration to Add:
+```
+<Directory /var/www/kheirkhah>
+    AuthType Basic
+    AuthName "Basic Authentication"
+    AuthUserFile /etc/httpd/conf/.htpasswd
+    require valid-user
+</Directory>
+```
+
+Directive Explanations:
+
+**`<Directory /var/www/kheirkhah>`**: Specifies that these rules apply only to the /var/www/kheirkhah directory.
+
+**`AuthType Basic`**: Sets the authentication method to "Basic".
+
+**`AuthName "Basic Authentication"`**: This is the text that will appear in the login prompt of the browser.
+
+**`AuthUserFile /etc/httpd/conf/.htpasswd`**: Tells Apache the exact path to the password file you created in Step 1.
+
+**`require valid-user`**: This is the authorization rule. It means that any user who is listed in the AuthUserFile is allowed to access the directory after successfully entering their password.
+
+### Step 3: Apply Changes
+Restart Apache for the new security rules to take effect.
+```
+sudo systemctl restart httpd 
+```
+
+Now, when you try to access the site hosted in /var/www/kheirkhah, you will be prompted for a username and password.
 
 
 
