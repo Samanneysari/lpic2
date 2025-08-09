@@ -1027,6 +1027,676 @@ SSLCertificateFile      /etc/ssl/ssl.crt/mftplus2026.ir.crt
 SSLCertificateKeyFile   /etc/ssl/ssl.key/mftplus2026_ir.key
 SSLCertificateChainFile /etc/ssl/ssl.key/Intermediate2026.cer
 ```
+# LAMP
+
+## What is LAMP?
+LAMP is an acronym for a popular open-source web development stack. It provides a complete platform for hosting dynamic websites and web applications. The components are:
+
+**`Linux`**: The operating system, providing the foundation for the stack.
+
+**`Apache`**: The web server, responsible for serving web content to users.
+
+**`MariaDB (or MySQL)`**: The relational database management system, used to store and manage the application's data.
+
+**`PHP`**: The server-side scripting language used to create dynamic content and interact with the database.
+
+## What is a CMS?
+CMS stands for Content Management System. A CMS is a software application that runs on a web server (often on a LAMP stack) and allows users to create, manage, and publish digital content without needing to write code from scratch.
+WordPress is the world's most popular CMS, powering a significant portion of the web. Other examples include Joomla and Magento.
+
+## Step-by-Step Guide: Installing WordPress on a LAMP Stack
+This guide will walk you through the complete process of setting up a functional WordPress website on a server with a freshly installed LAMP stack.
+
+### Step 1: Update System Packages
+First, ensure that all of your system's packages are up-to-date.
+```
+sudo dnf upgrade -y
+```
+### Step 2: Install and Enable Apache Web Server
+Install Apache (httpd), which will serve your WordPress site. Then, enable it to ensure it starts automatically on boot.
+```
+# Install the Apache package
+sudo dnf install httpd -y
+
+# Enable and start the httpd service immediately
+sudo systemctl enable --now httpd
+```
+
+The --now flag is a convenient shortcut that both enables and starts the service in a single command.
+
+### Step 3: Install and Secure MariaDB
+WordPress uses a database to store all of its content, such as posts, pages, and user information. We will install MariaDB, a popular open-source database server.
+```
+# Install the MariaDB server package
+sudo dnf install mariadb-server -y
+
+# Enable and start the mariadb service immediately
+sudo systemctl enable --now mariadb
+```
+After installation, run the security script to set a root password and remove insecure defaults.
+```
+sudo mysql_secure_installation --use-default
+```
+
+This script improves security by setting the root password, removing anonymous users, disallowing remote root login, and removing the test database.
+
+### Step 4: Install PHP
+Install PHP and the necessary extensions for WordPress to function correctly and communicate with the database.
+```
+sudo dnf install php php-mysqlnd php-gd php-xml php-mbstring -y
+```
+**`php`**: The core PHP package.
+
+**`php-mysqlnd`**: The module that allows PHP to connect to a MariaDB/MySQL database.
+
+**`php-gd, php-xml, php-mbstring`**: Extensions required by WordPress for image processing and other core functions.
+
+After installing PHP, you must restart Apache for it to recognize and load the new PHP module.
+```
+sudo systemctl restart httpd
+```
+
+### Step 5: Download and Prepare WordPress Files
+Download the latest version of WordPress from the official website and extract it.
+```
+# Download the latest WordPress archive
+curl -O https://wordpress.org/latest.tar.gz
+
+# Extract the files from the archive
+tar -xzvf latest.tar.gz
+```
+Next, copy the extracted WordPress files into Apache's default web root directory.
+```
+sudo cp -r wordpress/* /var/www/html
+```
+
+### Step 6: Set Correct File Ownership and Permissions
+The web server (running as the apache user) needs to be the owner of the WordPress files to be able to manage them (e.g., for installing themes, plugins, and media uploads).
+
+```
+# Set ownership of all files to the 'apache' user and group
+sudo chown -R apache:apache /var/www/html/
+
+# Set the correct permissions for directories and files
+sudo chmod -R 755 /var/www/html/
+```
+
+### Step 7: Create the WordPress Database and User
+Log in to the MariaDB command-line interface as the root user.
+```
+sudo mysql -u root -p
+```
+
+Now, create a dedicated database and user for your WordPress installation.
+```
+-- Create a new database named LOCALDEVELOPMENTENV
+CREATE DATABASE LOCALDEVELOPMENTENV;
+
+-- Create a new database user named 'admin' with a password
+-- NOTE: Always use a strong, unique password in a production environment.
+CREATE USER 'admin'@'localhost' IDENTIFIED BY 'password';
+
+-- Grant all privileges on the new database to the new user
+GRANT ALL PRIVILEGES ON LOCALDEVELOPMENTENV.* TO 'admin'@'localhost';
+
+-- Apply the new privileges immediately
+FLUSH PRIVILEGES;
+
+-- Exit the MariaDB client
+EXIT;
+```
+
+### Step 8: Configure WordPress to Connect to the Database
+WordPress needs to know the database details you just created. You will provide this information in the wp-config.php file. First, copy the sample file to create the actual configuration file.
+```
+sudo cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+```
+
+Now, open the file with a text editor.
+```
+sudo vi /var/www/html/wp-config.php
+```
+
+Find the following lines and replace the placeholder values with the database details you created in the previous step.
+
+```
+/** The name of the database for WordPress */
+define( 'DB_NAME', 'LOCALDEVELOPMENTENV' );
+
+/** Database username */
+define( 'DB_USER', 'admin' );
+
+/** Database password */
+define( 'DB_PASSWORD', 'password' );
+```
+
+Step 9: Configure Firewall and SELinux
+Allow public traffic to your web server by opening the HTTP and HTTPS ports in the firewall.
+```
+sudo firewall-cmd --add-service=http --add-service=https
+```
+```
+sudo systemctl reload firewalld
+```
+
+Note: This firewall rule is temporary and will be removed on reboot. To make it permanent, add the --permanent flag and then reload the firewall.
+
+Finally, set the correct SELinux context to allow Apache to write to the WordPress directory, which is necessary for uploading media and installing themes/plugins.
+```
+sudo chcon -R -t httpd_sys_rw_content_t /var/www/html/
+```
+
+After completing these steps, you can finish the installation by navigating to your server's IP address or domain name in a web browser, where you will be greeted by the WordPress installation screen.
+
+# Chapter 6: The Nginx Web Server
+## Introduction to Nginx
+
+Nginx (pronounced "Engine-X") is a high-performance, open-source web server.  It is also widely used as a reverse proxy, load balancer, mail proxy, and HTTP cache. Unlike traditional servers, Nginx uses an asynchronous, event-driven architecture, which allows it to handle thousands of concurrent connections with very low memory usage.
+
+## Key Differences Between Nginx and Apache
+While both are powerful web servers, they have fundamental differences in their design and typical use cases.
+
+| Feature          | Apache                                                                                     | Nginx                                                                                         |
+|------------------|-------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| **Architecture** | Uses a process-driven or thread-driven model, often creating a new process or thread for each connection. | Uses an event-driven, asynchronous architecture. A single worker process can handle thousands of connections. |
+| **Performance**  | Very flexible and powerful, but can consume more memory under very high concurrent loads. | Extremely efficient at serving static content and excels under high concurrency due to its low resource usage. |
+| **Configuration**| Supports distributed configuration using `.htaccess` files in web directories, which offers flexibility. | Does not support `.htaccess`. All configuration is centralized in main configuration files, which improves performance. |
+| **Primary Use Case** | A versatile, all-purpose web server with a vast library of modules.                      | Renowned for its high performance as a static web server and especially as a reverse proxy, often placed in front of other servers like Apache. |
+
+## Installation and Activation Steps
+
+### Step 1: Prepare the System (Install EPEL Repository)
+To get the latest version of Nginx, it's best to first install the EPEL (Extra Packages for Enterprise Linux) repository.
+```
+sudo dnf install epel-release -y 
+```
+
+### Step 2: Install Nginx
+Now, install the Nginx software package using the dnf package manager.
+```
+sudo dnf install nginx -y 
+```
+
+### Step 3: Manage the Service
+After installation, start the Nginx service and enable it to launch automatically every time the server boots.
+```
+# Start the Nginx service
+sudo systemctl start nginx
+
+# Enable Nginx to start on boot
+sudo systemctl enable nginx
+
+# Check the current status of the service
+sudo systemctl status nginx
+A Note on SELinux:
+The class notes mention 
+```
+
+*** PLEASE DISABLE SELINUX ***
+
+  While disabling SELinux can make setup easier in a testing environment, it is a significant security risk on a production server. The professional approach is to configure the correct SELinux security contexts for your web files and ports, not to disable the security system entirely.
+
+## Anatomy of a Server Block
+In Nginx, a virtual host is defined within a server block, which is the equivalent of Apache's <VirtualHost> block.
+```
+vim /etc/nginx/conf.d/s1.conf
+```
+```
+server {
+        listen 94.182.178.227:80; 
+        server_name _; 
+        root /var/www/s1; 
+        index index.html; 
+}
+```
+
+**`server { ... }`**: This defines the start and end of a virtual server configuration block.
 
 
+**`listen 94.182.178.227:80;`**: This directive tells Nginx to listen for incoming connections on the specific IP address 
+
+94.182.178.227 and on port 80.
+
+
+**`server_name _;`**: This directive specifies which domain names should match this server block. The underscore (_) is a special, non-standard hostname that acts as a default or catch-all. If a request arrives on this IP and port that does not match any other server_name directive, this block will handle it.
+
+
+**`root /var/www/s1;`**: This sets the document root directory for this virtual server. Nginx will look for the website's files in this directory.
+
+
+**`index index.html;`**: This directive specifies which file to serve if a directory is requested by the client (e.g., when a user visits http://94.182.178.227/).
+
+
+# Chapter 7: The LEMP Stack and Nginx Configuration
+## What is LEMP?
+LEMP is an acronym for a popular open-source web development stack used for hosting high-performance, dynamic websites. The components are:
+
+**`Linux`**: The operating system that provides the foundation for the stack.
+
+**`Enginx (pronounced "Engine-X")`**: The high-performance web server.
+
+**`MariaDB (or MySQL)`**: The relational database management system.
+
+**`PHP`**: The server-side scripting language, which is processed by PHP-FPM in this stack.
+
+The LEMP stack is a powerful alternative to the traditional LAMP stack, with Nginx's event-driven architecture offering excellent performance, especially under high load.
+
+
+## Step-by-Step Guide: LEMP Stack Installation on Rocky Linux
+This guide will walk you through the complete installation of all components of the LEMP stack.
+
+### Step 1: Install Nginx on Rocky Linux
+The first component is the Nginx web server.
+
+Update System Packages: First, ensure your system is up-to-date.
+```
+$ sudo dnf update -y
+```
+
+Install Nginx: Use the dnf package manager to install Nginx.
+```
+$ sudo dnf install nginx -y
+```
+
+Enable and Start Nginx: Enable the service to start automatically on boot and then start it.
+```
+$ sudo systemctl enable nginx
+$ sudo systemctl start nginx
+```
+
+Verify Nginx Status: Confirm that the web server is running correctly.
+```
+$ sudo systemctl status nginx
+```
+
+You can also verify the installation by navigating to your server's IP address (http://server-ip) in a web browser, which should display the default Nginx welcome page.
+
+Configure Firewall: Allow public HTTP traffic through the firewall.
+```
+$ sudo firewall-cmd --zone=public --add-service=http --permanent
+$ sudo firewall-cmd --reload
+```
+
+### Step 2: Install MariaDB on Rocky Linux
+Next, install the MariaDB database server to store your website's data.
+
+Install MariaDB:
+```
+$ sudo dnf install mariadb-server mariadb -y
+```
+
+Enable and Start MariaDB:
+```
+$ sudo systemctl enable mariadb
+$ sudo systemctl start mariadb
+```
+
+Secure the MariaDB Installation: Run the provided security script to set a root password and remove insecure defaults.
+```
+$ sudo mysql_secure_installation
+```
+
+Follow the prompts. It is highly recommended to set a strong root password and answer 'Y' to all subsequent questions to secure your database.
+
+### Step 3: Install PHP on Rocky Linux
+The final component is PHP, which we will install using PHP-FPM (FastCGI Process Manager), an advanced and efficient processor for PHP.
+
+Enable the Remi Repository: The Remi repository provides more up-to-date versions of PHP.
+```
+
+$ sudo dnf install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm -y
+```
+
+Enable the PHP 8.0 Module: Reset the default PHP module and enable the newer remi-8.0 version.
+```
+$ sudo dnf module list reset php
+$ sudo dnf module enable php:remi-8.0
+```
+
+Install PHP-FPM and Extensions: Install PHP itself, along with common extensions needed for modern web applications.
+```
+
+$ sudo dnf install php php-fpm php-gd php-mysqlnd php-cli php-opcache -y
+```
+
+Enable and Start PHP-FPM:
+```
+$ sudo systemctl enable php-fpm
+$ sudo systemctl start php-fpm
+```
+
+Configure PHP-FPM for Nginx: By default, PHP-FPM runs as the apache user. We must change this to nginx.
+```
+$ sudo vim /etc/php-fpm.d/www.conf
+```
+
+Find the user and group directives and change them to nginx:
+```
+Ini, TOML
+
+user = nginx
+group = nginx
+```
+
+Reload the PHP-FPM service to apply the changes:
+```
+$ sudo systemctl reload php-fpm
+```
+
+Configuring an Nginx Server Block for a Website
+Once the LEMP stack is installed, you can host a website by creating a server block.
+
+### Step 1: Create a Website Directory
+Create a directory structure to hold your website's files. Replace example.com with your actual domain name.
+```
+$ sudo mkdir -p /var/www/example.com/html
+```
+
+### Step 2: Set Ownership and Permissions
+Change the ownership of the directory to your regular user account. The $USER variable will automatically be replaced with your currently logged-in username.
+```
+
+$ sudo chown -R $USER:$USER /var/www/example.com/html
+```
+
+Then, set the correct permissions to allow public read access.
+```
+$ sudo chmod -R 755 /var/www
+```
+
+### Step 3: Create a Demo Site
+Create a simple index.html file for testing purposes.
+```
+$ sudo vim /var/www/example.com/html/index.html
+
+```
+
+Add the following sample content:
+
+```
+<html>
+  <head>
+    <title>Welcome to Example.com!</title>
+  </head>
+  <body>
+    <h1>Success! The server block is active!</h1>
+  </body>
+</html>
+```
+
+### Step 4: Create the Nginx Server Block File
+Create the sites-available and sites-enabled directories, which is a common practice for managing server blocks.
+```
+$ sudo mkdir /etc/nginx/sites-available
+$ sudo mkdir /etc/nginx/sites-enabled
+```
+Next, edit the main Nginx configuration file to include configurations from the sites-enabled directory.
+```
+$ sudo vim /etc/nginx/nginx.conf
+```
+
+Add the following line inside the http block:
+```
+include /etc/nginx/sites-enabled/*.conf;
+server_names_hash_bucket_size 64;
+```
+Now, create the actual server block file for your site.
+```
+$ sudo vim /etc/nginx/sites-available/example.com.conf
+```
+
+Add the following configuration. Remember to replace example.com with your domain.
+```
+server {
+    listen  80;
+    server_name example.com www.example.com;
+
+    location / {
+        root  /var/www/example.com/html;
+        index  index.html index.htm;
+        try_files $uri $uri/ =404;
+    }
+
+    error_page  500 502 503 504  /50x.html;
+    location = /50x.html {
+        root  /usr/share/nginx/html;
+    }
+}
+```
+
+### Step 5: Enable the Nginx Server Block
+Enable your new server block by creating a symbolic link from the sites-available directory to the sites-enabled directory.
+```
+$ sudo ln -s /etc/nginx/sites-available/example.com.conf /etc/nginx/sites-enabled/example.com.conf
+```
+
+### Step 6: Test the Configuration
+Finally, restart Nginx to apply all changes.
+```
+$ sudo systemctl restart nginx
+```
+
+You should now be able to visit http://example.com in your browser and see your demo page.
+
+## Configuring Nginx for PHP Processing (FastCGI)
+To make your Nginx server block process PHP files, you need to modify its location block to pass PHP requests to the PHP-FPM service we installed earlier.
+
+Modify your server block file (/etc/nginx/sites-available/example.com.conf) to look like this:
+```
+server {
+    listen  80;
+    server_name example.com www.example.com;
+    root  /var/www/example.com/html;
+    
+    # Prioritize index.php as the default file
+    index  index.php index.html index.htm;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+    
+    # This block handles PHP requests
+    location ~ \.php$ {
+        include fastcgi.conf;
+        fastcgi_pass unix:/run/php-fpm/www.sock;
+    }
+}
+```
+
+**`location ~ \.php$`**: This tells Nginx that this block of rules applies to any request that ends with .php.
+
+**`include fastcgi.conf;`**: This includes a standard set of FastCGI configuration parameters that are needed for PHP to function correctly.
+
+**`fastcgi_pass unix:/run/php-fpm/www.sock;`**: This is the most important line. It tells Nginx to "pass" the PHP request to the PHP-FPM processor via a fast Unix socket located at /run/php-fpm/www.sock.
+
+After saving this change, restart Nginx again. You can now place a PHP file (like the info.php test file) in your document root, and Nginx will process it correctly.
+
+# Chapter 8: Proxy Server with Squid
+## What is a Proxy Server?
+A Proxy Server is an intermediary server that acts as a gateway between computers on an internal network and the internet. When a user on the internal network makes a request to access a website, the request is first sent to the proxy server. The proxy server then forwards that request to the internet on the user's behalf, receives the response, and then sends it back to the user.
+
+### Goals and Applications of a Proxy Server
+Proxy servers are used in corporate networks for several important reasons:
+
+**`Content Caching`**: The proxy can save a copy of frequently accessed content (like web pages or files). When another user requests the same content, the proxy serves it directly from its cache, which saves internet bandwidth and significantly speeds up access to repeated information.
+
+**`Access Filtering`**: Administrators can define rules to block access to specific websites or content. This is essential for enforcing an organization's internet usage policies.
+
+**`Security & Anonymity`**: Because all requests are sent from the proxy server, the IP addresses of the internal client computers are hidden from the internet. This provides an important layer of security and prevents direct attacks on user devices.
+
+**`Logging & Monitoring`**: The proxy server can log all internet activity, allowing network administrators to monitor internet usage and for security analysis.
+
+## What is Squid?
+Squid is one of the oldest, most popular, and most powerful open-source software applications for implementing a Forward Proxy Server. Squid is renowned for its high-performance caching engine and its advanced filtering capabilities using Access Control Lists (ACLs).
+
+Step-by-Step Installation and Configuration Guide
+This guide will walk you through setting up a Squid proxy server for an internal network with the IP address range 192.168.1.0/24.
+
+### 1. Install Squid
+First, install the Squid software package and enable the service.
+```
+# Install the squid package
+sudo dnf install squid -y
+
+# Start and enable the service
+sudo systemctl start squid
+sudo systemctl enable squid
+```
+
+### 2. Prepare the Configuration File
+The main configuration file is /etc/squid/squid.conf. It's a very long file, so it's a best practice to back it up and start with a clean, simple configuration.
+```
+# Back up the original file
+sudo cp /etc/squid/squid.conf /etc/squid/squid.conf.original
+
+# Empty the current file to start fresh
+sudo truncate -s 0 /etc/squid/squid.conf
+
+# Open the file for editing
+sudo vim /etc/squid/squid.conf
+```
+
+### 3. Core Configuration
+Now, we will add our essential rules to the empty squid.conf file.
+```
+# Define the proxy port
+http_port 3128
+
+# Define Access Control Lists (ACLs)
+acl localnet src 192.168.1.0/24
+acl SSL_ports port 443
+acl CONNECT method CONNECT
+
+# Define Access Rules
+http_access deny CONNECT !SSL_ports
+http_access allow localhost
+http_access allow localnet
+http_access deny all
+```
+
+
+**`http_port 3128`**: Tells Squid to listen for client requests on port 3128.
+
+**`acl localnet src 192.168.1.0/24`**: Defines an Access Control List named localnet that matches any traffic coming from our internal network.
+
+**`acl SSL_ports port 443`**: Defines an ACL for the standard HTTPS port.
+
+**`acl CONNECT method CONNECT`**: Defines an ACL for the CONNECT method, which is used for establishing HTTPS tunnels.
+
+**`http_access deny CONNECT !SSL_ports`**: A security rule that only allows the CONNECT method for secure SSL ports.
+
+**`http_access allow localhost`**: Allows the server itself to use the proxy.
+
+**`http_access allow localnet`**: This is the main rule that allows users from our internal network (localnet) to access the internet.
+
+**`http_access deny all`**: This is the most important security rule. It must always be at the end. It blocks any request that did not match one of the allow rules above.
+
+### 4. Apply Configuration and Configure Firewall
+After saving the file, check it for errors, restart the service, and open the port in the firewall.
+```
+# Check the configuration file for syntax errors
+sudo squid -k parse
+
+# Restart the squid service
+sudo systemctl restart squid
+
+# Open the proxy port in the firewall
+sudo firewall-cmd --add-port=3128/tcp --permanent
+sudo firewall-cmd --reload
+```
+
+### 5. Configure the Client
+The final step is to configure the web browsers or operating system network settings on the client computers (in the 192.168.1.0/24 network) to use the proxy server by specifying your Squid server's IP address and the port 3128.
+
+# Chapter 9: The Reverse Proxy
+## Definition of a Reverse Proxy
+A Reverse Proxy is a type of server that sits in front of one or more backend servers, intercepting all incoming requests from clients. From the client's perspective, the reverse proxy is the single point of contact; the client is completely unaware of the backend servers that are actually processing the request.
+
+Unlike a Forward Proxy, which acts on behalf of the client, a Reverse Proxy acts on behalf of the server infrastructure to provide security, performance, and reliability.
+
+### Step-by-Step: How a Reverse Proxy Works
+Here is the complete journey of a user's request from beginning to end:
+
+**`Client Request`**: A user's web browser sends a request to a website (e.g., www.example.com).
+
+**`DNS Resolution`**: The Domain Name System (DNS) resolves www.example.com to the public IP address of the Reverse Proxy server.
+
+**`Proxy Receives Request`**: The Reverse Proxy receives the HTTP request from the user.
+
+**`Proxy Selects a Backend Server`**: The Reverse Proxy examines the request and, based on its configured load-balancing algorithm, chooses one healthy server from its pool of backend servers.
+
+**`Proxy Forwards the Request`**: The proxy sends a new request over the private network to the chosen backend server. It typically adds important HTTP headers, like X-Forwarded-For, to inform the backend server of the original client's IP address.
+
+**`Backend Server Processes Request`**: The backend server (e.g., an Apache or application server) handles the request and generates a response.
+
+**`Backend Responds to Proxy`**: The backend server sends its response back to the Reverse Proxy.
+
+**`Proxy Responds to Client`**: The Reverse Proxy sends the final response back to the user's browser. The entire backend infrastructure remains hidden from the client.
+
+## Three Primary Load Balancing Methods
+A reverse proxy uses different algorithms to decide how to distribute incoming requests. Here are three of the most common methods:
+
+### Round Robin
+This is the simplest method. The reverse proxy sends requests to its backend servers in a simple, rotating sequence. The first request goes to Server A, the second to Server B, the third back to Server A, and so on. This method works best when all backend servers have similar processing power.
+
+### Least Connections
+This is a more intelligent method. The reverse proxy keeps track of the number of active connections to each backend server. It sends the next incoming request to the server that currently has the fewest active connections. This is very effective when requests have varying processing times.
+
+### IP Hash
+In this method, the reverse proxy uses the client's IP address to calculate a hash, which determines which backend server will handle the request. This ensures that requests from a specific user will always be sent to the same backend server. This is critical for applications that require "sticky sessions," such as a web store where a user's shopping cart is stored on a specific server.
+
+## Example Nginx Configuration
+This example shows how to configure Nginx as a reverse proxy and load balancer for two backend web servers.
+```
+vim /etc/nginx/conf.d/reverse-proxy.conf
+```
+```
+# Define a group (or "pool") of backend servers
+upstream backend_servers {
+    # The default algorithm is Round Robin. For others, add a directive here.
+    # For example: least_conn; or ip_hash;
+    server 192.168.1.101; # Web Server 1
+    server 192.168.1.102; # Web Server 2
+}
+
+# Define the reverse proxy virtual server
+server {
+    listen 80;
+    server_name example.com www.example.com;
+
+    location / {
+        proxy_pass http://backend_servers;
+        
+        # Set headers to pass the original client's info to the backend
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+**`upstream backend_servers { ... }`**: This block defines a named group of backend servers called backend_servers. Nginx will distribute traffic among the servers listed inside this block.
+
+**`server 192.168.1.101;`**: This line adds a backend server with the specified IP address to the upstream group.
+
+**`server { ... }`**: This is the main virtual server block that listens for public traffic.
+
+**`listen 80;`**: Tells Nginx to listen for incoming requests on port 80.
+
+**`server_name example.com www.example.com;`**: Specifies that this block should handle requests for these domain names.
+
+**`location / { ... }`**: This block applies to all incoming requests for this site.
+
+**`proxy_pass http://backend_servers;`**: This is the core directive. It tells Nginx to forward (or "proxy pass") the request to the upstream group named backend_servers.
+
+**`proxy_set_header ...`**: These directives are crucial. They add or modify HTTP headers that are sent to the backend server. Without them, the backend server would only see the IP of the proxy, not the original user.
+
+**`Host`**: Passes the original hostname requested by the client.
+
+**`X-Real-IP`**: Passes the original IP address of the client.
+
+**`X-Forwarded-For`**: A standard header that provides a list of all proxies a request has passed through, starting with the original client.
+
+**`X-Forwarded-Proto`**: Informs the backend server whether the original connection was http or https.
 
