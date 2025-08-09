@@ -823,7 +823,7 @@ Create a simple test page inside the user's web directory.
 ```
 sudo vim /home/pouria/public_html/index.html 
 ```
-* Content: Add some basic HTML, for example: <h1>Pouria's Home Page</h1>.
+* Content: Add some basic HTML, for example: Pouria's Home Page
 
 ### Step 5: Apply Changes
 Finally, restart Apache to apply the new configuration.
@@ -895,7 +895,7 @@ sudo systemctl restart httpd
 Now, when you try to access the site hosted in /var/www/kheirkhah, you will be prompted for a username and password.
 
 
-# Securing Apache with SSL/TLS (HTTPS)
+# Chapter 4: Securing Apache with SSL/TLS (HTTPS)
 This chapter explains how to encrypt the communication between your web server and your users' browsers.
 
 ## Section 1: Understanding the Concepts of SSL/TLS
@@ -1027,7 +1027,7 @@ SSLCertificateFile      /etc/ssl/ssl.crt/mftplus2026.ir.crt
 SSLCertificateKeyFile   /etc/ssl/ssl.key/mftplus2026_ir.key
 SSLCertificateChainFile /etc/ssl/ssl.key/Intermediate2026.cer
 ```
-# LAMP
+# Chapter5: LAMP
 
 ## What is LAMP?
 LAMP is an acronym for a popular open-source web development stack. It provides a complete platform for hosting dynamic websites and web applications. The components are:
