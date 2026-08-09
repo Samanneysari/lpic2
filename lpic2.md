@@ -249,7 +249,7 @@ A DNS Zone is a specific part of the internet's domain name system that is manag
 ### Zone File
 The Zone File is the actual text file stored on a DNS server. This file contains all the technical data and DNS records for a specific zone. When you need to make changes to your domain, you edit this file.
 
-### aster and Slave Servers
+### Master and Slave Servers
 For reliability, a domain should always have more than one DNS server. These servers operate in master and slave roles.
 
 **`Master Server`**: This is the main, primary server for a zone. It holds the original, editable version of the zone file. All changes to the zone must be made on this server.
