@@ -11,6 +11,22 @@ A web client opens a TCP connection to a server, sends an HTTP request, and rece
 
 Apache and Nginx can both serve files and proxy requests. Apache is highly modular and commonly uses per-directory configuration. Nginx uses an event-driven design and is commonly used for static files, TLS termination, and reverse proxying. The exam expects both; they do not need to be installed on the same lab host.
 
+### From the browser to the final content
+
+A complete HTTPS request crosses several independently testable layers:
+
+1. DNS resolves the requested hostname; the full lookup path is explained in [Topic 207](topic-207-dns.md#from-a-url-to-a-rendered-page-the-complete-path).
+2. The client routes to an address and opens TCP port 443, or QUIC when HTTP/3 is used.
+3. TLS uses SNI to select a site and the client validates the certificate chain and SAN.
+4. The HTTP Host or <code>:authority</code> value selects an Apache virtual host or Nginx server block.
+5. The server normalizes and routes the URI, then applies authentication, authorization, and rewrite policy.
+6. Static content is read from the selected document root, or a reverse proxy sends the request to a backend.
+7. The backend may query files, caches, or databases and returns a response to the proxy.
+8. The server adds or removes controlled headers, logs the transaction, and returns status, headers, and body.
+9. The browser renders the response and may start additional DNS, TLS, and HTTP requests for other origins.
+
+A DNS success proves only step 1. A TCP success does not prove TLS identity, and a valid certificate does not prove correct virtual-host routing or application health. Diagnose the first failing layer.
+
 ### Files, processes, and permissions
 
 The service normally starts as root only long enough to bind privileged ports, then handles requests with an unprivileged account. Content should be readable by that account but should not all be writable by it. Give write permission only to paths that an application must modify, such as a dedicated upload directory.

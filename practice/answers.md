@@ -51,6 +51,20 @@
 44. 113.0.203.in-addr.arpa.
 45. Message authentication and integrity using a shared key; it does not encrypt the transfer.
 46. No. DNSSEC authenticates DNS data and detects forged or modified answers.
+
+### DNS architecture and rDNS deep-dive answers
+
+- **DNS-1:** The resolver asks a root server, follows its referral to an <code>ir</code> authoritative server, follows that referral to an authoritative server for <code>realsam.ir</code>, and asks for the final A/AAAA data or follows a returned CNAME chain.
+- **DNS-2:** The stub passes an application question to a resolver; the recursive resolver searches and caches on the client's behalf; the authoritative server gives final data or referrals for zones it serves.
+- **DNS-3:** Owner, TTL, class, type, and type-specific RDATA. Records with the same owner, class, and type form one RRset.
+- **DNS-4:** SOA stores zone authority and timing; NS names authorities; A/AAAA map names to IPv4/IPv6; CNAME aliases one owner and normally cannot coexist with other owner data; MX selects mail hosts by preference and must target a real hostname; PTR maps a reverse owner to a name; TXT carries application text; SRV carries service priority, weight, port, and target.
+- **DNS-5:** <code>25.113.0.203.in-addr.arpa.</code>
+- **DNS-6:** Reverse authority follows the IP allocation, so the ISP, cloud provider, or address-block holder controls or delegates the reverse zone; the registrar controls forward domain delegation.
+- **DNS-7:** Query PTR for the address, then query A/AAAA for the returned hostname and confirm one result is the original address.
+- **DNS-8:** NXDOMAIN says the owner name does not exist. NOERROR with no requested-type answer says the name exists but that record type is absent (NODATA).
+- **DNS-9:** Routing/neighbor discovery, TCP or QUIC, TLS/SNI/certificate validation, HTTP virtual-host and application processing, and browser rendering are valid layers.
+- **DNS-10:** Receivers use consistent rDNS as a reputation and identity signal, but it does not authorize the sender or replace SMTP policy, SPF, DKIM, DMARC, TLS, content checks, and reputation.
+
 47. apachectl configtest or the distribution-equivalent apache2ctl configtest.
 48. Basic credentials are only encoded and can be read from unencrypted traffic.
 49. Subject Alternative Name, or SAN.

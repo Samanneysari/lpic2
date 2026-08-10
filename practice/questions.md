@@ -121,6 +121,19 @@ These are original study questions, not real LPI exam questions. Answer them wit
 45. What does TSIG provide for a DNS zone transfer?
 46. Does DNSSEC encrypt DNS answers? What problem does it solve?
 
+### DNS architecture and rDNS deep dive
+
+- **DNS-1:** Starting with an empty recursive cache, list the authorities contacted to resolve <code>www.realsam.ir</code>.
+- **DNS-2:** What is the difference between a stub resolver, recursive resolver, and authoritative server?
+- **DNS-3:** Name the five logical fields of a resource record and explain what an RRset is.
+- **DNS-4:** Explain the purpose and one important rule for SOA, NS, A, AAAA, CNAME, MX, PTR, TXT, and SRV.
+- **DNS-5:** What exact PTR owner name is queried for IPv4 address 203.0.113.25?
+- **DNS-6:** Why can the owner of <code>realsam.ir</code> usually not set public rDNS only through the domain registrar?
+- **DNS-7:** What two lookups demonstrate forward-confirmed reverse DNS?
+- **DNS-8:** How do NXDOMAIN and a NOERROR response with no requested-type answer differ?
+- **DNS-9:** After DNS returns an address, name four layers that must still work before a user sees an HTTPS page.
+- **DNS-10:** Why is a matching mail-server PTR useful but insufficient as proof that a message is legitimate?
+
 ### Objective 208.1
 
 47. Which command should be run before reloading Apache configuration?

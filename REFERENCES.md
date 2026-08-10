@@ -33,6 +33,10 @@
 
 - [DNS concepts: RFC 1034](https://www.rfc-editor.org/rfc/rfc1034)
 - [DNS implementation: RFC 1035](https://www.rfc-editor.org/rfc/rfc1035)
+- [Common DNS operational errors and forward/reverse consistency: RFC 1912](https://www.rfc-editor.org/rfc/rfc1912)
+- [Classless IPv4 reverse delegation: RFC 2317](https://www.rfc-editor.org/rfc/rfc2317)
+- [IPv6 DNS extensions and AAAA: RFC 3596](https://www.rfc-editor.org/rfc/rfc3596)
+- [Current DNS terminology: RFC 9499](https://www.rfc-editor.org/rfc/rfc9499)
 - [DHCP: RFC 2131](https://www.rfc-editor.org/rfc/rfc2131)
 - [BOOTP: RFC 951](https://www.rfc-editor.org/rfc/rfc951)
 - [Private IPv4 addresses: RFC 1918](https://www.rfc-editor.org/rfc/rfc1918)

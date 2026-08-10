@@ -1,15 +1,22 @@
 # Glossary
 
+- **A record:** A DNS record that maps an owner name to an IPv4 address.
+- **AAAA record:** A DNS record that maps an owner name to an IPv6 address.
 - **ACL:** A rule that allows or denies access.
 - **Authoritative DNS server:** A server that provides final answers for a DNS zone it owns.
 - **Bootloader:** Software that loads the operating-system kernel.
 - **Cache:** Stored data used to answer repeated requests faster.
 - **CIDR:** Prefix notation such as 10.20.0.0/24 that describes a network.
+- **CNAME:** A DNS record that makes one owner name an alias of a canonical target name.
 - **Daemon:** A background service process.
 - **Default gateway:** The router used to reach networks outside the local subnet.
 - **DN:** A Distinguished Name that identifies an LDAP entry.
+- **DNS:** The distributed hierarchical database that stores typed data under domain names.
+- **DNSSEC:** DNS extensions that authenticate DNS data and prove nonexistence; they do not encrypt queries or answers.
 - **DNS zone:** An administratively managed part of the DNS namespace.
+- **FCrDNS:** Forward-confirmed reverse DNS, where a PTR target resolves forward to the original address.
 - **FQDN:** A complete name such as www.realsam.ir.
+- **Glue:** Address data supplied by a parent zone so a delegated in-bailiwick name server can be reached.
 - **Filesystem:** The format and structures used to store files on a block device.
 - **Forward proxy:** A proxy that acts for clients.
 - **Initramfs:** A temporary root filesystem used during boot.
@@ -18,19 +25,29 @@
 - **Load average:** A measure of runnable and uninterruptible work waiting for CPU or I/O.
 - **Logical volume:** A flexible block device created by LVM.
 - **MTA:** A Mail Transfer Agent such as Postfix.
+- **MX:** A DNS record that selects mail exchangers; a lower preference number is attempted first.
 - **NAT:** Translation between one set of IP addresses and another.
+- **NODATA:** A successful DNS response indicating that the name exists but has no RRset of the requested type.
+- **NS:** A DNS record that names an authoritative server for a zone or delegates a child zone.
+- **NXDOMAIN:** A DNS response stating that the queried owner name does not exist.
 - **PAM:** Pluggable Authentication Modules, the common Linux authentication framework.
+- **PTR:** A DNS pointer record used for IP-to-name reverse mapping under <code>in-addr.arpa</code> or <code>ip6.arpa</code>.
 - **Primary DNS server:** The editable source of a zone, traditionally called master.
 - **RAID:** A method of combining disks for performance or redundancy.
 - **Recursive resolver:** A DNS server that searches for answers for a client.
+- **rDNS:** Reverse DNS, the process of querying PTR data for an IP address.
+- **Resource record:** One typed DNS data item with owner, TTL, class, type, and RDATA.
+- **RRset:** All DNS records with the same owner, class, and type.
 - **Reverse proxy:** A proxy that receives client traffic for back-end servers.
 - **Secondary DNS server:** A read-only copy of a zone, traditionally called slave.
 - **SNI:** TLS information that allows several HTTPS names to share one IP address.
 - **SOA:** Start of Authority, the main metadata record of a DNS zone.
 - **Swap:** Disk-backed memory used when RAM pressure is high.
 - **Target:** A named systemd state that groups units.
+- **TTL:** The time in seconds for which DNS caches may normally reuse an RRset.
 - **TLS:** The protocol that protects data in transit.
 - **TSIG:** A shared-key mechanism that authenticates DNS messages such as zone transfers.
 - **Unit:** A resource managed by systemd, such as a service, mount, socket, or timer.
 - **Virtual host:** A web-server configuration for one or more site names.
 - **Volume group:** A pool of LVM physical storage.
+- **Zone apex:** The owner name at the top of a DNS zone, represented by <code>@</code> in many zone files.

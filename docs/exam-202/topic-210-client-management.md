@@ -34,6 +34,21 @@ LDAP stores entries in a hierarchical Directory Information Tree. Every entry ha
 
 OpenLDAP uses slapd as the server. Modern installations commonly store live configuration under cn=config, while the exam also expects awareness of traditional slapd.conf. Use TLS for credentials and restrict anonymous access and write permissions.
 
+### From a login name to an LDAP-backed session
+
+A typical Linux login using SSSD and LDAP follows this path:
+
+1. A service such as <code>sshd</code> starts the PAM stack named by its PAM service configuration.
+2. An NSS lookup asks where the username and group information can be found.
+3. NSS contacts SSSD according to <code>/etc/nsswitch.conf</code>.
+4. SSSD checks its cache and, when required, queries LDAP for identity attributes.
+5. PAM asks the configured SSSD PAM module to authenticate and perform account checks.
+6. SSSD contacts the directory through the configured protected channel and evaluates provider policy.
+7. PAM control flags combine the module result with other required, requisite, sufficient, or optional modules.
+8. If identity, authentication, and account policy succeed, the application creates the session.
+
+DNS discovery, TLS trust, time synchronization, directory reachability, LDAP search base, UID/GID mapping, PAM order, and account policy can fail independently. Keep a tested local recovery account and an existing root session while changing this chain.
+
 ### Safe implementation sequence
 
 Build DHCP in an isolated lab, validate before service start, and inspect leases. For PAM or LDAP identity changes, keep an existing root console session open, test with a separate session, and retain a known local emergency account.

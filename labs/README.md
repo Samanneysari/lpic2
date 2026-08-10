@@ -137,18 +137,25 @@ Success: the restored data matches and the build can be inventoried.
 
 Objectives: 207.1-207.3
 
-1. Build separate recursive and authoritative servers.
-2. Create forward and reverse zones for realsam.ir.
-3. Add a secondary server.
-4. Protect transfer with TSIG.
-5. Validate with named-checkconf and named-checkzone.
-6. Query SOA, NS, A, AAAA, MX, PTR, TXT, and SRV.
-7. Confirm recursion is denied to an untrusted client.
-8. Confirm unauthorized AXFR fails.
-9. Create one delegated lab subdomain.
-10. Explain the DNSSEC signing and parent DS process.
+1. Draw the root, <code>ir</code>, <code>realsam.ir</code>, host, and delegated child-zone hierarchy.
+2. Build separate recursive and authoritative servers.
+3. Create a forward zone and identify owner, TTL, class, type, and RDATA in every record.
+4. Query and explain SOA, NS, A, AAAA, CNAME, MX, PTR, TXT, SRV, and CAA.
+5. Create a reverse declaration and zone for the isolated 203.0.113.0/24 network.
+6. Configure consistent A and PTR data for <code>mail.realsam.ir</code> and demonstrate FCrDNS.
+7. Explain why a real public PTR must be set or delegated by the IP-address provider.
+8. Convert one IPv4 and one IPv6 address to their full reverse query owners.
+9. Add a secondary server and compare SOA serials.
+10. Protect transfer with TSIG.
+11. Validate with <code>named-checkconf -z</code> and <code>named-checkzone</code>.
+12. Confirm recursion is denied to an untrusted client.
+13. Confirm unauthorized AXFR fails.
+14. Create one delegated lab subdomain and identify required glue.
+15. Trace a web request from the stub resolver through root, TLD, authoritative answer, routing, TLS, HTTP, and rendering.
+16. Produce and diagnose NXDOMAIN, NODATA, REFUSED, and SERVFAIL in the isolated lab.
+17. Explain RFC 2317 classless reverse delegation and the DNSSEC signing and parent DS process.
 
-Success: authoritative answers, recursion policy, and transfer policy work as designed.
+Success: forward and reverse authority, record meanings, resolution flow, recursion policy, transfer policy, and public rDNS ownership can all be explained and demonstrated.
 
 ## Lab 208: HTTP services
 
