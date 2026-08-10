@@ -45,6 +45,8 @@ Sieve rules are user-controlled filtering logic. Validate and compile them with 
 6. Verify that unauthorized relay is rejected.
 7. Inspect the queue and logs.
 8. Add SPF, DKIM, and DMARC operationally even though their full deployment is beyond the core objective.
+
+For a public outbound server, verify that the provider-controlled PTR points to the intended mail hostname and that the hostname resolves back to the same address. The ownership model, BIND examples, FCrDNS test, and limitations of rDNS are explained in [Topic 207](topic-207-dns.md#reverse-dns-rdns-and-ptr-records).
 <!-- END BEGINNER FOUNDATION -->
 
 Email flow commonly uses:
