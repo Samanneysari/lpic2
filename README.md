@@ -59,7 +59,7 @@ Private labs use addresses such as 10.20.0.0/24. Public examples use the documen
 
 | Objectives | Topic | Guide |
 |---|---|---|
-| 207.1-207.3 | DNS | [Topic 207](docs/exam-202/topic-207-dns.md) |
+| 207.1-207.3 | DNS hierarchy, end-to-end resolution, records, BIND, rDNS/PTR, and DNS security | [Topic 207](docs/exam-202/topic-207-dns.md) |
 | 208.1-208.4 | HTTP Services | [Topic 208](docs/exam-202/topic-208-http-services.md) |
 | 209.1-209.2 | File Sharing | [Topic 209](docs/exam-202/topic-209-file-sharing.md) |
 | 210.1-210.4 | Network Client Management | [Topic 210](docs/exam-202/topic-210-client-management.md) |
