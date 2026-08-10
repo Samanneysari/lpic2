@@ -19,6 +19,29 @@ A network share does not replace local permissions. Samba maps authenticated SMB
 
 root_squash is an important NFS protection: client root is mapped to an unprivileged identity. Avoid no_root_squash except for a narrowly justified design.
 
+### From a client request to a file
+
+For a Samba access:
+
+1. The client resolves the server name and connects to the SMB service.
+2. Protocol negotiation selects supported SMB capabilities.
+3. The server authenticates the user against its configured identity source.
+4. Samba maps that identity to a Unix account or security token.
+5. Share rules decide whether the requested share and operation are allowed.
+6. The kernel then checks Unix ownership, mode bits, ACLs, mount state, and SELinux/AppArmor policy.
+7. Only when both Samba policy and local filesystem policy allow the operation does data reach the client.
+
+For an NFS access:
+
+1. The client resolves the server and contacts the NFS/RPC services required by the chosen version.
+2. The server matches the client against an export and its options.
+3. NFS presents a numeric UID/GID or a mapped identity.
+4. Options such as <code>root_squash</code>, read-only mode, and subtree policy transform or restrict the request.
+5. The local filesystem and security policy make the final access decision.
+6. Client mount options influence behavior but cannot grant permission denied by the server.
+
+This is why changing a share to world-writable is not a valid troubleshooting method. Identify the exact layer that denied the operation.
+
 ### Safe implementation sequence
 
 1. Decide who should access the data and whether they need read or write permission.
