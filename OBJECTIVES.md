@@ -27,9 +27,9 @@ This checklist follows LPIC-2 objectives version 4.5. Mark an item only after yo
 
 ## Exam 202-450
 
-- [ ] 207.1 Basic DNS server configuration — weight 3
-- [ ] 207.2 Create and maintain DNS zones — weight 3
-- [ ] 207.3 Secure a DNS server — weight 2
+- [ ] 207.1 Basic DNS server configuration, hierarchy, resolution lifecycle, and resource records — weight 3
+- [ ] 207.2 Create and maintain forward and reverse zones, including rDNS/PTR — weight 3
+- [ ] 207.3 Secure a DNS server with role separation, TSIG, DNSSEC, and controlled transfers — weight 2
 - [ ] 208.1 Basic Apache configuration — weight 4
 - [ ] 208.2 Apache configuration for HTTPS — weight 3
 - [ ] 208.3 Implement Squid as a caching proxy — weight 2
