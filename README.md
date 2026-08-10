@@ -11,6 +11,10 @@ The official objectives are available at [Linux Professional Institute](https://
 
 > This guide explains the exam subjects in simple English. It does not contain real exam questions and it does not replace hands-on practice.
 
+## Beginner-first teaching promise
+
+Each exam chapter first explains what the subject is, how it works, and why an administrator uses it. Procedures come afterward. Every non-empty command and configuration line shown in the active topic chapters is followed by a line-by-line explanation table. The full learning contract and scope are in [lpic2.md](lpic2.md).
+
 ## How to use this guide
 
 1. Read the topics in order.
@@ -96,6 +100,16 @@ sudo squid -k parse
 sudo dhcpd -t -cf /etc/dhcp/dhcpd.conf
 ~~~
 
+**Line-by-line explanation**
+
+| Line | Command | What it does |
+|---:|---|---|
+| 1 | <code>sudo named-checkconf -z</code> | Uses administrator access to parse BIND configuration and load every primary zone in validation mode without reloading the running service. |
+| 2 | <code>sudo apachectl configtest</code> | Uses administrator access to parse the complete Apache configuration and report syntax errors. |
+| 3 | <code>sudo nginx -t</code> | Uses administrator access to parse Nginx configuration and verify referenced files can be opened. |
+| 4 | <code>sudo squid -k parse</code> | Uses administrator access to parse Squid configuration without starting or reloading the proxy. |
+| 5 | <code>sudo dhcpd -t -cf /etc/dhcp/dhcpd.conf</code> | Uses administrator access to test the selected DHCP configuration file without starting the DHCP server. |
+
 ## Repository history
 
-The original notes are preserved at [legacy/lpic2-original.md](legacy/lpic2-original.md). The root [lpic2.md](lpic2.md) is now a compatibility index for the corrected modular guide.
+The original notes are preserved unchanged at [legacy/lpic2-original.md](legacy/lpic2-original.md). The root [lpic2.md](lpic2.md) is the detailed entrance and learning contract for the corrected modular guide.

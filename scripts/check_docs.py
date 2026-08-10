@@ -11,6 +11,13 @@ from urllib.parse import unquote
 ROOT = Path(__file__).resolve().parents[1]
 ALL_MARKDOWN = sorted(ROOT.rglob("*.md"))
 ACTIVE_MARKDOWN = [path for path in ALL_MARKDOWN if "legacy" not in path.parts]
+TEACHING_MARKDOWN = [
+    path
+    for path in ACTIVE_MARKDOWN
+    if "docs/exam-201" in path.as_posix()
+    or "docs/exam-202" in path.as_posix()
+    or path.as_posix().endswith("appendices/web-stacks.md")
+]
 
 EXPECTED_OBJECTIVES = {
     "200.1", "200.2",
@@ -37,7 +44,8 @@ UNSAFE_PATTERNS = {
 }
 
 LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
-OBJECTIVE_RE = re.compile(r"(?<![\\d.])(?:20[0-9]|21[0-2])\\.[1-5](?![\\d.])")
+OBJECTIVE_RE = re.compile(r"(?<![\d.])(?:20[0-9]|21[0-2])\.[1-5](?![\d.])")
+EXPLANATION_ROW_RE = re.compile(r"^\| \d+ \|")
 BACKTICK_FENCE = chr(96) * 3
 TILDE_FENCE = "~" * 3
 
@@ -85,6 +93,64 @@ def check_links(path: Path, text: str, errors: list[str]) -> None:
             errors.append(f"{relative(path)}: missing local link target: {target}")
 
 
+def check_teaching_structure(path: Path, text: str, errors: list[str]) -> None:
+    if "BEGIN BEGINNER FOUNDATION" not in text:
+        errors.append(f"{relative(path)}: missing beginner theory section")
+
+    lines = text.splitlines()
+    in_fence = False
+    fence_token = ""
+    code_start = 0
+    nonempty_code_lines = 0
+
+    for index, line in enumerate(lines):
+        stripped = line.lstrip()
+        is_fence = (
+            stripped.startswith(BACKTICK_FENCE)
+            or stripped.startswith(TILDE_FENCE)
+        )
+        if not in_fence and is_fence:
+            in_fence = True
+            fence_token = stripped[:3]
+            code_start = index + 1
+            nonempty_code_lines = 0
+            continue
+        if not in_fence:
+            continue
+        if is_fence and stripped[:3] == fence_token:
+            in_fence = False
+            cursor = index + 1
+            while cursor < len(lines) and not lines[cursor].strip():
+                cursor += 1
+            if (
+                cursor >= len(lines)
+                or not lines[cursor].startswith("<!-- LINE-BY-LINE ")
+            ):
+                errors.append(
+                    f"{relative(path)}:{code_start}: "
+                    "code block has no immediate line-by-line explanation"
+                )
+                continue
+            row_count = 0
+            cursor += 1
+            while cursor < len(lines) and row_count == 0:
+                if EXPLANATION_ROW_RE.match(lines[cursor]):
+                    break
+                cursor += 1
+            while cursor < len(lines) and EXPLANATION_ROW_RE.match(lines[cursor]):
+                row_count += 1
+                cursor += 1
+            if row_count != nonempty_code_lines:
+                errors.append(
+                    f"{relative(path)}:{code_start}: "
+                    f"{nonempty_code_lines} non-empty code lines but "
+                    f"{row_count} explanation rows"
+                )
+            continue
+        if line.strip():
+            nonempty_code_lines += 1
+
+
 def main() -> int:
     errors: list[str] = []
     found_objectives: set[str] = set()
@@ -110,6 +176,9 @@ def main() -> int:
                         f"{relative(path)}:{line_number}: {message}: {pattern}"
                     )
 
+    for path in TEACHING_MARKDOWN:
+        check_teaching_structure(path, path.read_text(encoding="utf-8"), errors)
+
     missing = sorted(EXPECTED_OBJECTIVES - found_objectives)
     unknown = sorted(found_objectives - EXPECTED_OBJECTIVES)
     if missing:
@@ -124,8 +193,9 @@ def main() -> int:
         return 1
 
     print(
-        f"Validated {len(ALL_MARKDOWN)} Markdown files and "
-        f"{len(EXPECTED_OBJECTIVES)} LPIC-2 objectives."
+        f"Validated {len(ALL_MARKDOWN)} Markdown files, "
+        f"{len(EXPECTED_OBJECTIVES)} LPIC-2 objectives, and "
+        f"{len(TEACHING_MARKDOWN)} beginner-first teaching files."
     )
     return 0
 
