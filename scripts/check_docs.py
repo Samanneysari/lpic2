@@ -37,7 +37,7 @@ UNSAFE_PATTERNS = {
 }
 
 LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
-OBJECTIVE_RE = re.compile(r"\b(?:20[0-9]|21[0-2])\.\d\b")
+OBJECTIVE_RE = re.compile(r"(?<![\\d.])(?:20[0-9]|21[0-2])\\.[1-5](?![\\d.])")
 BACKTICK_FENCE = chr(96) * 3
 TILDE_FENCE = "~" * 3
 
