@@ -1,0 +1,36 @@
+# Glossary
+
+- **ACL:** A rule that allows or denies access.
+- **Authoritative DNS server:** A server that provides final answers for a DNS zone it owns.
+- **Bootloader:** Software that loads the operating-system kernel.
+- **Cache:** Stored data used to answer repeated requests faster.
+- **CIDR:** Prefix notation such as 10.20.0.0/24 that describes a network.
+- **Daemon:** A background service process.
+- **Default gateway:** The router used to reach networks outside the local subnet.
+- **DN:** A Distinguished Name that identifies an LDAP entry.
+- **DNS zone:** An administratively managed part of the DNS namespace.
+- **FQDN:** A complete name such as www.realsam.ir.
+- **Filesystem:** The format and structures used to store files on a block device.
+- **Forward proxy:** A proxy that acts for clients.
+- **Initramfs:** A temporary root filesystem used during boot.
+- **Kernel:** The core of Linux that manages hardware, memory, processes, and system calls.
+- **LDAP:** A protocol for accessing directory information.
+- **Load average:** A measure of runnable and uninterruptible work waiting for CPU or I/O.
+- **Logical volume:** A flexible block device created by LVM.
+- **MTA:** A Mail Transfer Agent such as Postfix.
+- **NAT:** Translation between one set of IP addresses and another.
+- **PAM:** Pluggable Authentication Modules, the common Linux authentication framework.
+- **Primary DNS server:** The editable source of a zone, traditionally called master.
+- **RAID:** A method of combining disks for performance or redundancy.
+- **Recursive resolver:** A DNS server that searches for answers for a client.
+- **Reverse proxy:** A proxy that receives client traffic for back-end servers.
+- **Secondary DNS server:** A read-only copy of a zone, traditionally called slave.
+- **SNI:** TLS information that allows several HTTPS names to share one IP address.
+- **SOA:** Start of Authority, the main metadata record of a DNS zone.
+- **Swap:** Disk-backed memory used when RAM pressure is high.
+- **Target:** A named systemd state that groups units.
+- **TLS:** The protocol that protects data in transit.
+- **TSIG:** A shared-key mechanism that authenticates DNS messages such as zone transfers.
+- **Unit:** A resource managed by systemd, such as a service, mount, socket, or timer.
+- **Virtual host:** A web-server configuration for one or more site names.
+- **Volume group:** A pool of LVM physical storage.
