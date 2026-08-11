@@ -60,7 +60,7 @@ Private labs use addresses such as 10.20.0.0/24. Public examples use the documen
 | Objectives | Topic | Guide |
 |---|---|---|
 | 207.1-207.3 | DNS hierarchy, end-to-end resolution, records, BIND, rDNS/PTR, and DNS security | [Topic 207](docs/exam-202/topic-207-dns.md) |
-| 208.1-208.4 | HTTP Services | [Topic 208](docs/exam-202/topic-208-http-services.md) |
+| 208.1-208.4 | HTTP, Apache, HTTPS/TLS, Squid, Nginx, web serving, and reverse proxying | [Topic 208](docs/exam-202/topic-208-http-services.md) · [Deep web-server path](docs/exam-202/topic-208/README.md) |
 | 209.1-209.2 | File Sharing | [Topic 209](docs/exam-202/topic-209-file-sharing.md) |
 | 210.1-210.4 | Network Client Management | [Topic 210](docs/exam-202/topic-210-client-management.md) |
 | 211.1-211.3 | Email Services | [Topic 211](docs/exam-202/topic-211-email.md) |
@@ -78,6 +78,7 @@ The [objective coverage checklist](OBJECTIVES.md) maps all 41 objectives and the
 - [Distribution differences](docs/distribution-notes.md)
 - [Glossary](GLOSSARY.md)
 - [Official references](REFERENCES.md)
+- [Topic 208 deep web-server labs, exercises, and production checklists](docs/exam-202/topic-208/README.md)
 - [Optional LAMP, LEMP, and WordPress appendix](appendices/web-stacks.md)
 
 ## Safe command pattern

@@ -34,6 +34,8 @@ This checklist follows LPIC-2 objectives version 4.5. Mark an item only after yo
 - [ ] 208.2 Apache configuration for HTTPS — weight 3
 - [ ] 208.3 Implement Squid as a caching proxy — weight 2
 - [ ] 208.4 Implement Nginx as a web server and reverse proxy — weight 2
+
+Topic 208 is covered twice on purpose: the [exam-focused chapter](docs/exam-202/topic-208-http-services.md) maps the official terms directly, while the [deep web-server path](docs/exam-202/topic-208/README.md) adds production scenarios, labs, exercises, and operational checklists.
 - [ ] 209.1 Samba server configuration — weight 5
 - [ ] 209.2 NFS server configuration — weight 3
 - [ ] 210.1 DHCP configuration — weight 2

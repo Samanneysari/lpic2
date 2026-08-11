@@ -62,7 +62,7 @@ Private lab networks use RFC 1918 addresses such as 10.20.0.0/24. Examples that 
 | Official objective | What you learn | Chapter |
 |---|---|---|
 | 207.1-207.3 | DNS hierarchy and request flow, record types, BIND, forward/reverse zones, rDNS/PTR, delegation, transfers, TSIG, and DNSSEC | [Topic 207: DNS](docs/exam-202/topic-207-dns.md) |
-| 208.1-208.4 | Apache, TLS, Squid, Nginx, and reverse proxying | [Topic 208: HTTP Services](docs/exam-202/topic-208-http-services.md) |
+| 208.1-208.4 | HTTP, Apache, TLS, Squid, Nginx, reverse proxying, and production web operations | [Topic 208: HTTP Services](docs/exam-202/topic-208-http-services.md) · [Deep web-server path](docs/exam-202/topic-208/README.md) |
 | 209.1-209.2 | Samba/SMB and NFS server and client administration | [Topic 209: File Sharing](docs/exam-202/topic-209-file-sharing.md) |
 | 210.1-210.4 | DHCP, PAM, NSS, LDAP clients, and OpenLDAP | [Topic 210: Network Client Management](docs/exam-202/topic-210-client-management.md) |
 | 211.1-211.3 | Postfix, mailbox access, Dovecot, and Sieve | [Topic 211: Email Services](docs/exam-202/topic-211-email.md) |
@@ -77,6 +77,7 @@ Private lab networks use RFC 1918 addresses such as 10.20.0.0/24. Examples that 
 - [Distribution differences](docs/distribution-notes.md)
 - [Official references](REFERENCES.md)
 - [Optional LAMP, LEMP, and WordPress appendix](appendices/web-stacks.md)
+- [Scenario-driven Topic 208 web-server path](docs/exam-202/topic-208/README.md)
 
 ## Safety rule
 

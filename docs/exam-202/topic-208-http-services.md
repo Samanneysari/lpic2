@@ -2,6 +2,9 @@
 
 Objectives: 208.1, 208.2, 208.3, and 208.4
 
+> [!TIP]
+> Study this chapter first for the official exam scope. Then use the [Topic 208 deep learning path](topic-208/README.md) for complete scenario-driven Apache, Nginx, TLS/ACME, reverse-proxy, load-balancing, PHP-FPM, security, performance, observability, troubleshooting, and production practice. The original exam-focused explanations below remain intact.
+
 <!-- BEGIN BEGINNER FOUNDATION -->
 ## Learn the idea before running commands
 

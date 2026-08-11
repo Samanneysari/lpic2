@@ -171,6 +171,8 @@ Objectives: 208.1-208.4
 8. Induce one syntax error in each service and prove the validator catches it.
 9. Remove the errors and reload without unnecessary restart.
 
+After this exam-focused lab, complete the [40 scenario-driven Topic 208 web-server labs](../docs/exam-202/topic-208/labs.md). They add Nginx and Apache request selection, Squid forward-proxy policy, reverse-proxy header trust, load balancing, PHP-FPM, certificate renewal, SELinux, monitoring, performance, recovery, and a full capstone.
+
 Success: every service is validated and tested from a client.
 
 ## Lab 209: File sharing
